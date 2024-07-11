@@ -1,0 +1,25 @@
+-------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/Alessa/Desktop/econ-255-fa23/data-brief-1/logs/data-brief-1.log
+  log type:  text
+ opened on:  23 Oct 2023, 12:42:05
+
+.                 
+.                 /* clean up county opioid data for analysis */
+.                         do "$code/1.prep-data-for-analysis.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 1
+> 
+>   File Name: prep-data-for-analysis.do
+> 
+>   Description: This program prepares the county opioid data for analysis
+> 
+>                           
+>   Data source: https://data.mendeley.com/datasets/dwfgxrh7tn/8
+> *******************************************************************************/
+. 
+. /* clear anything in memory */
+.       clear all
+
+.       capture log close

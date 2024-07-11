@@ -1,0 +1,2140 @@
+-------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/Alessa/Desktop/econ-255-fa23/data-brief-2/logs/data-brief-2.log
+  log type:  text
+ opened on:   6 Nov 2023, 17:35:47
+
+.                 
+.                 /* clean up census data for analysis */
+.                         do "$code/1.prep-data-for-analysis.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+> 
+>   File Name: prep-data-for-analysis.do
+> 
+>   Description: This program prepares the household pulse data for analysis
+> 
+>                           
+>   Data source: https://www.census.gov/programs-surveys/household-pulse-survey/datasets.ht
+> ml
+> *******************************************************************************/
+. 
+. 
+.         /* import raw csv of household pulse data */
+.                 import delimited "$data/raw/household-pulse/pulse2023_puf_62.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(247 vars, 72,839 obs)
+
+.                 
+.                 
+. 
+. /******************************************************************************/      
+. /************************    clean the data  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         /* only keep data for states in the Appalacia region */
+.         /* keep if F12424 == "OH" | F12424 == "WV" | F12424 == "KY" | F12424 == "PA" | F1
+> 2424 == "MD" */
+. 
+.         /*Employment status variable: 'anywork' - 1) yes 2) no -99) question seeen but on
+>  answered 88)not seen */
+.         order anywork
+
+.         
+.         /* Food security variable: 'CURFOODSUF' - household food sufficiency for last 7 d
+> ays. 1- "enough of the kinds of food (I/we wanted to eat)" 2- "Enough but not always the 
+> kinds of food (I/we wanted to eat)" 3- "sometimes not enough to eat" 4- "often not enough
+>  to eat" -99-"question seen but category not selected" -88 - "missing/did not report" */
+.         
+.         order curfoodsuf
+
+.         
+.         /* Housing security variable: 'evict' - eviction in next two months 1) very likel
+> y 2) somewhat likely 3) not very likely 4) not likely at all -99) question seen but categ
+> ory not selected -88) missing/ did not report */
+.          
+.          order evict
+
+.         /*Housing security variable: 'rentcur' - caught up on rent - 1) yes 2)no -99) que
+> stion seen but category not selected -88) missing / did not report */
+.         order rentcur
+
+.         
+.         /* Housing security variable: 'expns_dif' - difficulty with expenses - "in the la
+> st 7 days, how difficult has it been for your household to pay for usual household expens
+> es, including but not limited to food, rent, or mortgage, car payments, medicail expensis
+> es and so on? 1) not at all difficult 2) a little difficult 3)somewhat difficult 4) very 
+> difficult -99) question seen but category not selected -88) missing /did not report */
+.         order expns_dif
+
+.         /* get rid of missing data for expns_dif */ 
+.         keep if expns_dif == 1 | expns_dif == 2 | expns_dif == 3 | expns_dif == 4 
+(5,376 observations deleted)
+
+.         
+.         /* Access to Healthcare variable: 'HLTHINS1' - Health Insurance Coverage- Insuran
+> ce through a current or former employer or union (through yourself or another family memb
+> er) 1) yes 2) no -99) saw no answer -88) didnt see */
+.         order hlthins1
+
+.         gen health_security = (hlthins1 == 1)
+
+.         
+.         /* create binary variable for employment */
+.   gen employed = (anywork == 1)
+
+.   order employed
+
+.   
+.    gen rent_yes = (rentcur == 1)
+
+.    order rent_yes
+
+.    
+.    /* to calculate age: 2023- birthdayer*/
+.         gen age = 2023 - tbirth_year
+
+.         order age
+
+.                 
+.         /* save the cleaned data */ 
+.                 save "$data/data-for-analysis.dta", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/data/data-for-analysis.dta saved
+
+.                         
+.                         
+.                         
+.                         
+.                         
+. 
+end of do-file
+
+.                 
+.                 /* create figures for data brief */
+.                         do "$code/2.create-visualizations.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 2.create-visualizations.do
+> 
+>   Description: This program creates DB2 visualizations
+> 
+> *******************************************************************************/
+. 
+.         /* import data cleaned by previous do file */ 
+.                 use "$data/data-for-analysis.dta", clear
+
+.                 
+. 
+.                 
+.                 
+. /******************************************************************************/      
+. /***************************    create figure 1  ******************************/         
+>  
+. /******************************************************************************/        
+.         
+. 
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+.         
+. /******************************************************************************/      
+. /***************************    create figure 2  ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+end of do-file
+
+.                 
+.                 /* run main regression for data brief */
+.                         do "$code/3.run-regressions.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+. 
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Table title goes here.") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Table note goes here.")
+estimation result r* not found
+r(111);
+
+end of do-file
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         /* import data cleaned by previous do file */ 
+.                 use "$data/data-for-analysis.dta", clear
+
+.                 
+. 
+.                 
+.                 
+. /******************************************************************************/      
+. /***************************    create figure 1  ******************************/         
+>  
+. /******************************************************************************/        
+. 
+. /* Provide a visualization supporting a claim that the conditional expectation of your LH
+> S variable changes with respect to variation in your RHS variable */
+. 
+.         
+. // Assuming you've run the regression (replace variables and regression command with your
+>  own)
+. regress age i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    67,463
+-------------+----------------------------------   F(1, 67461)     =   2990.30
+       Model |  729351.641         1  729351.641   Prob > F        =    0.0000
+    Residual |  16454108.1    67,461  243.905488   R-squared       =    0.0424
+-------------+----------------------------------   Adj R-squared   =    0.0424
+       Total |  17183459.8    67,462  254.713169   Root MSE        =    15.617
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+  1.rent_yes |  -8.389665   .1534218   -54.68   0.000    -8.690372   -8.088959
+       _cons |   54.29862   .0667889   812.99   0.000     54.16771    54.42953
+------------------------------------------------------------------------------
+
+. 
+. // Create a scatterplot with a fitted line
+. twoway (scatter age i.rent_yes) ///
+>        (lfit age i.rent_yes), ///
+>        title("Conditional Expectation Plot") ///
+>        xtitle("RHS Variable") ytitle("LHS Variable")
+factor-variable operators not allowed
+r(101);
+
+end of do-file
+
+r(101);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. // Create a scatterplot with a fitted line
+. twoway (scatter age i.rent_yes) ///
+>        (lfit age i.rent_yes), ///
+>        title("Conditional Expectation Plot") ///
+>        xtitle("RHS Variable") ytitle("LHS Variable")
+factor-variable operators not allowed
+r(101);
+
+end of do-file
+
+r(101);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. // Assuming you've run the regression (replace variables and regression command with your
+>  own)
+. regress age i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    67,463
+-------------+----------------------------------   F(1, 67461)     =   2990.30
+       Model |  729351.641         1  729351.641   Prob > F        =    0.0000
+    Residual |  16454108.1    67,461  243.905488   R-squared       =    0.0424
+-------------+----------------------------------   Adj R-squared   =    0.0424
+       Total |  17183459.8    67,462  254.713169   Root MSE        =    15.617
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+  1.rent_yes |  -8.389665   .1534218   -54.68   0.000    -8.690372   -8.088959
+       _cons |   54.29862   .0667889   812.99   0.000     54.16771    54.42953
+------------------------------------------------------------------------------
+
+. 
+. // Create a scatterplot with a fitted line
+. twoway (scatter age rent_yes) ///
+>        (lfit age rent_yes), ///
+>        title("Conditional Expectation Plot") ///
+>        xtitle("RHS Variable") ytitle("LHS Variable")
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.                 
+.                 scatter rent_yes age 
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) age, by(i.rent_yes)
+factor-variable and time-series operators not allowed
+(error in option by())
+r(101);
+
+end of do-file
+
+r(101);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) age, by(rent_yes)
+
+.                 
+.                 scatter age rent_yes 
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.                 
+.                 scatter age rent_yes 
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.                 
+.                 scatter age rent_yes 
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age rent_yes) ///
+>        (lfit age rent_yes), ///
+>        title("Conditional Expectation Plot") ///
+>        xtitle("RHS Variable") ytitle("LHS Variable")
+
+.            
+.            regress age i.rent_yes
+rent_yes:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /* health acess: insurance access */
+. preserve
+
+.                 collapse (mean) health_security, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age health_security) ///
+>        (lfit age health_security), ///
+>        title("Conditional Expectation Plot of Age and Rent") ///
+>        xtitle("health_security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_health_security_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_health_security_scatter.png saved as
+    PNG format
+
+.           
+.            regress age i.health_security
+health_security:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         order curfoodsuf
+
+.         keep if curfoodsuf == 1 | curfoodsuf == 2 | curfoodsuf == 3 | curfoodsuf == 4 
+(1,214 observations deleted)
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         /* save the cleaned data */ 
+.                 save "$data/data-for-analysis.dta", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/data/data-for-analysis.dta saved
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age i.curfoodsuf) ///
+>        (lfit age curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+factor-variable operators not allowed
+r(101);
+
+end of do-file
+
+r(101);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age curfoodsuf) ///
+>        (lfit age i.curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+factor-variable operators not allowed
+r(101);
+
+end of do-file
+
+r(101);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age curfoodsuf) ///
+>        (lfit age curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_food_security_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_food_security_scatter.png saved as
+    PNG format
+
+.           
+.            regress age i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(1, 66247)     =   3470.69
+       Model |  836645.315         1  836645.315   Prob > F        =    0.0000
+    Residual |  15969524.3    66,247   241.06034   R-squared       =    0.0498
+-------------+----------------------------------   Adj R-squared   =    0.0498
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.526
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+1.health_security |  -7.234448   .1227998   -58.91   0.000    -7.475136   -6.993761
+            _cons |   57.02791   .0945871   602.91   0.000     56.84252     57.2133
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) health_security, by(age)
+
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age curfoodsuf) ///
+>        (lfit age curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+variable curfoodsuf not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) curfoodsuf, by(age)
+
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age curfoodsuf) ///
+>        (lfit age curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_food_security_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_food_security_scatter.png saved as
+    PNG format
+
+.           
+.            regress age i.health_security
+variable health_security not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. scatter age rent_yes, title("Correlation between Y and X")
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.         scatter age rent_yes, title("Correlation between Y and X")
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) expns_dif, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age expns_dif) ///
+>        (lfit age expns_dif), ///
+>        title("Conditional Expectation Plot of Age and Economic Security") ///
+>        xtitle("Economic Security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_economic_sec_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_economic_sec_scatter.png saved as
+    PNG format
+
+.           
+.            regress age i.expns_dif
+expns_dif:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.         collapse (mean) rent_yes, by(age)
+
+.         scatter health_security rent_yes, title("Correlation between Y and X")
+variable health_security not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.         collapse (mean) rent_yes, by(age)
+
+.         collapse (mean) health_security, by(age)
+variable health_security not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.         scatter curfoodsuf rent_yes, title("Correlation between Y and X")
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 2.create-visualizations.do
+> 
+>   Description: This program creates DB2 visualizations
+> 
+> *******************************************************************************/
+. 
+.         /* import data cleaned by previous do file */ 
+.                 use "$data/data-for-analysis.dta", clear
+
+.                 
+. 
+.                 
+.                 
+. /******************************************************************************/      
+. /***************************    first decriptive analysis part **************************
+> ****/          
+. /******************************************************************************/        
+. 
+. /* Provide a visualization supporting a claim that the conditional expectation of your LH
+> S variable changes with respect to variation in your RHS variable */
+. 
+. 
+. /* economic security: rent */
+. preserve
+
+.                 collapse (mean) expns_dif, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age expns_dif) ///
+>        (lfit age expns_dif), ///
+>        title("Conditional Expectation Plot of Age and Economic Security") ///
+>        xtitle("Economic Security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_economic_sec_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_economic_sec_scatter.png saved as
+    PNG format
+
+.           
+.            regress age i.expns_dif
+expns_dif:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 2.create-visualizations.do
+> 
+>   Description: This program creates DB2 visualizations
+> 
+> *******************************************************************************/
+. 
+.         /* import data cleaned by previous do file */ 
+.                 use "$data/data-for-analysis.dta", clear
+
+.                 
+. 
+.                 
+.                 
+. /******************************************************************************/      
+. /***************************    first decriptive analysis part **************************
+> ****/          
+. /******************************************************************************/        
+. 
+. /* Provide a visualization supporting a claim that the conditional expectation of your LH
+> S variable changes with respect to variation in your RHS variable */
+. 
+. 
+. /* economic security: rent */
+. preserve
+
+.                 collapse (mean) expns_dif, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age expns_dif) ///
+>        (lfit age expns_dif), ///
+>        title("Conditional Expectation Plot of Age and Economic Security") ///
+>        xtitle("Economic Security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_economic_sec_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_economic_sec_scatter.png saved as
+    PNG format
+
+.           
+.            regress age expns_dif
+
+      Source |       SS           df       MS      Number of obs   =        71
+-------------+----------------------------------   F(1, 69)        =    148.99
+       Model |  20381.2669         1  20381.2669   Prob > F        =    0.0000
+    Residual |  9438.73309        69  136.793233   R-squared       =    0.6835
+-------------+----------------------------------   Adj R-squared   =    0.6789
+       Total |       29820        70         426   Root MSE        =    11.696
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |  -88.95914   7.287982   -12.21   0.000    -103.4983   -74.42001
+       _cons |   236.3309    15.0834    15.67   0.000     206.2403    266.4214
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* housing security: rent */
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age rent_yes) ///
+>        (lfit age rent_yes), ///
+>        title("Conditional Expectation Plot of Age and Rent") ///
+>        xtitle("rent_yes") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_rentyes_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_rentyes_scatter.png saved as PNG
+    format
+
+.           
+.            regress age i.rent_yes
+rent_yes:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 2.create-visualizations.do
+> 
+>   Description: This program creates DB2 visualizations
+> 
+> *******************************************************************************/
+. 
+.         /* import data cleaned by previous do file */ 
+.                 use "$data/data-for-analysis.dta", clear
+
+.                 
+. 
+.                 
+.                 
+. /******************************************************************************/      
+. /***************************    first decriptive analysis part **************************
+> ****/          
+. /******************************************************************************/        
+. 
+. /* Provide a visualization supporting a claim that the conditional expectation of your LH
+> S variable changes with respect to variation in your RHS variable */
+. 
+. 
+. /* economic security: rent */
+. preserve
+
+.                 collapse (mean) expns_dif, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age expns_dif) ///
+>        (lfit age expns_dif), ///
+>        title("Conditional Expectation Plot of Age and Economic Security") ///
+>        xtitle("Economic Security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_economic_sec_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_economic_sec_scatter.png saved as
+    PNG format
+
+.           
+.            regress age expns_dif
+
+      Source |       SS           df       MS      Number of obs   =        71
+-------------+----------------------------------   F(1, 69)        =    148.99
+       Model |  20381.2669         1  20381.2669   Prob > F        =    0.0000
+    Residual |  9438.73309        69  136.793233   R-squared       =    0.6835
+-------------+----------------------------------   Adj R-squared   =    0.6789
+       Total |       29820        70         426   Root MSE        =    11.696
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |  -88.95914   7.287982   -12.21   0.000    -103.4983   -74.42001
+       _cons |   236.3309    15.0834    15.67   0.000     206.2403    266.4214
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* housing security: rent */
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age rent_yes) ///
+>        (lfit age rent_yes), ///
+>        title("Conditional Expectation Plot of Age and Rent") ///
+>        xtitle("rent_yes") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_rentyes_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_rentyes_scatter.png saved as PNG
+    format
+
+.           
+.            regress age rent_yes
+
+      Source |       SS           df       MS      Number of obs   =        71
+-------------+----------------------------------   F(1, 69)        =    126.72
+       Model |  19307.1765         1  19307.1765   Prob > F        =    0.0000
+    Residual |  10512.8235        69  152.359761   R-squared       =    0.6475
+-------------+----------------------------------   Adj R-squared   =    0.6423
+       Total |       29820        70         426   Root MSE        =    12.343
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    rent_yes |  -136.0891   12.08925   -11.26   0.000    -160.2065   -111.9717
+       _cons |    81.8269   2.950178    27.74   0.000     75.94145    87.71234
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* health acess: insurance access */
+. preserve
+
+.                 collapse (mean) health_security, by(age)
+
+.                 
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age health_security) ///
+>        (lfit age health_security), ///
+>        title("Conditional Expectation Plot of Age and Health Security") ///
+>        xtitle("health_security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_health_security_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_health_security_scatter.png saved as
+    PNG format
+
+.           
+.            regress age health_security
+
+      Source |       SS           df       MS      Number of obs   =        71
+-------------+----------------------------------   F(1, 69)        =     37.03
+       Model |  10415.2543         1  10415.2543   Prob > F        =    0.0000
+    Residual |  19404.7457        69  281.228198   R-squared       =    0.3493
+-------------+----------------------------------   Adj R-squared   =    0.3398
+       Total |       29820        70         426   Root MSE        =     16.77
+
+---------------------------------------------------------------------------------
+            age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+health_security |  -80.32177    13.1986    -6.09   0.000    -106.6522   -53.99129
+          _cons |   98.14559   7.680723    12.78   0.000     82.82297    113.4682
+---------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. /* food security: curfoodsuf */
+. preserve
+
+.                 collapse (mean) curfoodsuf, by(age)
+
+.                 // Create a scatterplot with a fitted line
+.         twoway (scatter age curfoodsuf) ///
+>        (lfit age curfoodsuf), ///
+>        title("Conditional Expectation Plot of Age and Food Security") ///
+>        xtitle("food security") ytitle("Age")
+
+.            
+.             /* export the histogram to output folder */
+.       graph export "$output/age_food_security_scatter.png", replace
+file ~/Desktop/econ-255-fa23/data-brief-2/output/age_food_security_scatter.png saved as
+    PNG format
+
+.           
+.            regress age curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =        71
+-------------+----------------------------------   F(1, 69)        =    190.73
+       Model |  21898.1169         1  21898.1169   Prob > F        =    0.0000
+    Residual |  7921.88312        69    114.8099   R-squared       =    0.7343
+-------------+----------------------------------   Adj R-squared   =    0.7305
+       Total |       29820        70         426   Root MSE        =    10.715
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+  curfoodsuf |  -153.9824   11.14955   -13.81   0.000    -176.2252   -131.7397
+       _cons |   281.2319   16.57466    16.97   0.000     248.1664    314.2974
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+.         
+.         
+. /******************************************************************************/      
+. /***************************    second descriptive analysis part  ***********************
+> *******/          
+. /******************************************************************************/
+. 
+. preserve
+
+.         scatter curfoodsuf rent_yes, title("Correlation between Y and X")
+
+.                 
+. restore
+
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) expns_dif, by(age)
+
+.            regress age i.expns_dif
+expns_dif:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.                 collapse (mean) rent_yes, by(age)
+
+.            regress age i.rent_yes
+rent_yes:  factor variables may not contain noninteger values
+r(452);
+
+end of do-file
+
+r(452);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. preserve
+
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* housing security: rent */
+. preserve
+
+.            regress age i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(1, 66247)     =   3057.45
+       Model |  741425.517         1  741425.517   Prob > F        =    0.0000
+    Residual |  16064744.1    66,247  242.497685   R-squared       =    0.0441
+-------------+----------------------------------   Adj R-squared   =    0.0441
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.572
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+  1.rent_yes |   -8.48408   .1534351   -55.29   0.000    -8.784812   -8.183347
+       _cons |   54.36948   .0673301   807.51   0.000     54.23751    54.50144
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* health acess: insurance access */
+. preserve
+
+.            regress age i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(1, 66247)     =   3470.69
+       Model |  836645.315         1  836645.315   Prob > F        =    0.0000
+    Residual |  15969524.3    66,247   241.06034   R-squared       =    0.0498
+-------------+----------------------------------   Adj R-squared   =    0.0498
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.526
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+1.health_security |  -7.234448   .1227998   -58.91   0.000    -7.475136   -6.993761
+            _cons |   57.02791   .0945871   602.91   0.000     56.84252     57.2133
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. /* food security: curfoodsuf */
+. preserve
+
+.                 regress age i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    220.43
+       Model |  166107.355         3  55369.1184   Prob > F        =    0.0000
+    Residual |  16640062.3    66,245  251.189709   R-squared       =    0.0099
+-------------+----------------------------------   Adj R-squared   =    0.0098
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.849
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+  curfoodsuf |
+          2  |  -2.371169   .1379635   -17.19   0.000    -2.641577    -2.10076
+          3  |  -5.043785   .2541624   -19.84   0.000    -5.541943   -4.545627
+          4  |  -4.593205   .4167727   -11.02   0.000    -5.410079    -3.77633
+             |
+       _cons |   53.86338   .0782811   688.08   0.000     53.70995    54.01682
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. preserve
+
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. preserve
+
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+. preserve
+
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+. preserve
+
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. preserve
+
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. preserve
+
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+. preserve
+
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+. preserve
+
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 
+. restore
+
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Table title goes here.") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Table note goes here.")
+estimation result r* not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         esttab r* using "$output/tables/table-1.rtf", ///
+
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         esttab r* using "$output/tables/table-1.rtf"
+estimation result r* not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/Users/Alessa/Desktop/econ-255-fa23/data-brief-2/code/3.run-regressions.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. 
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.                 
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. 
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Table title goes here.") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Table note goes here.")
+estimation result r* not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+.         esttab col using "$output/tables/table-1.rtf", ///
+
+end of do-file
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. 
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.            est sto col1
+
+.                 
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. 
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 est sto col2
+
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 est sto col3
+
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 est sto col4
+
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab col using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Table title goes here.") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Table note goes here.")
+estimation result col not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "/var/folders/gm/1_yd9ms51pncnym7gy3gs34h0000gp/T//SD51960.000000"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. 
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.            est store reg1
+
+.                 
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. 
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 est store reg2
+
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 est store reg3
+
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 est store reg4
+
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Table title goes here.") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Table note goes here.")
+(file /Users/Alessa/Desktop/econ-255-fa23/data-brief-2/output/tables/table-1.rtf not
+    found)
+(output written to ~/Desktop/econ-255-fa23/data-brief-2/output/tables/table-1.rtf)
+
+.                 
+.                 
+. 
+end of do-file
+
+. do "/Users/Alessa/Desktop/econ-255-fa23/data-brief-2/code/3.run-regressions.do"
+
+. /********************************************************************************\
+>   Project: ECON 255 - Data Brief 2
+>   
+>   File Name: 3.run-regressions.do
+> 
+>   Description: This program performs regressions on the data
+> 
+> *******************************************************************************/
+. 
+. 
+.         /* import data for analysis */
+.                 use "$data/data-for-analysis.dta", replace
+
+.         
+.         
+. 
+. /******************************************************************************/      
+. /**********************    run  regressions  **********************************/         
+>  
+. /******************************************************************************/
+. 
+. /* Run a bivariate OLS regression of your LHS and RHS variables */ 
+. 
+.            regress age i.expns_dif
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(3, 66245)     =    370.51
+       Model |  277339.895         3  92446.6316   Prob > F        =    0.0000
+    Residual |  16528829.8    66,245  249.510601   R-squared       =    0.0165
+-------------+----------------------------------   Adj R-squared   =    0.0165
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.796
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -3.290089   .1522363   -21.61   0.000    -3.588472   -2.991706
+          3  |   -3.41136   .1728262   -19.74   0.000    -3.750099    -3.07262
+          4  |  -5.654206    .188571   -29.98   0.000    -6.023805   -5.284607
+             |
+       _cons |    55.1201   .0986531   558.73   0.000     54.92674    55.31346
+------------------------------------------------------------------------------
+
+.            est store reg1
+
+.                 
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including the first of yo
+> ur 3 additional variables*/
+. 
+.            regress age i.expns_dif i.rent_yes
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(4, 66244)     =    955.51
+       Model |  916758.674         4  229189.668   Prob > F        =    0.0000
+    Residual |    15889411    66,244  239.861889   R-squared       =    0.0545
+-------------+----------------------------------   Adj R-squared   =    0.0545
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.487
+
+------------------------------------------------------------------------------
+         age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   expns_dif |
+          2  |  -2.737784   .1496466   -18.29   0.000    -3.031091   -2.444476
+          3  |  -2.609465   .1701618   -15.34   0.000    -2.942982   -2.275948
+          4  |  -4.523364   .1861818   -24.30   0.000     -4.88828   -4.158448
+             |
+  1.rent_yes |  -7.948624   .1539501   -51.63   0.000    -8.250366   -7.646882
+       _cons |   56.18107   .0988855   568.14   0.000     55.98726    56.37489
+------------------------------------------------------------------------------
+
+.                 est store reg2
+
+. 
+. 
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including 2 of your 3 add
+> itional variables*/
+.            regress age i.expns_dif i.rent_yes i.health_security
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(5, 66243)     =   1662.63
+       Model |  1873923.22         5  374784.644   Prob > F        =    0.0000
+    Residual |  14932246.4    66,243  225.416216   R-squared       =    0.1115
+-------------+----------------------------------   Adj R-squared   =    0.1114
+       Total |  16806169.6    66,248  253.685691   Root MSE        =    15.014
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -3.202731   .1452458   -22.05   0.000    -3.487412   -2.918049
+               3  |  -3.503289   .1655276   -21.16   0.000    -3.827723   -3.178855
+               4  |  -6.147375   .1822009   -33.74   0.000    -6.504489   -5.790261
+                  |
+       1.rent_yes |  -7.747475   .1492742   -51.90   0.000    -8.040052   -7.454898
+1.health_security |  -7.819017   .1199918   -65.16   0.000    -8.054201   -7.583833
+            _cons |   61.31556   .1240888   494.13   0.000     61.07235    61.55878
+-----------------------------------------------------------------------------------
+
+.                 est store reg3
+
+. 
+. /* Run a multivariate regression of your LHS and RHS variables, including all 3 of your a
+> dditional variables */
+.                 regress age i.expns_dif i.rent_yes i.health_security i.curfoodsuf
+
+      Source |       SS           df       MS      Number of obs   =    66,249
+-------------+----------------------------------   F(8, 66240)     =   1056.75
+       Model |  1902152.32         8   237769.04   Prob > F        =    0.0000
+    Residual |  14904017.3    66,240  225.000262   R-squared       =    0.1132
+-------------+----------------------------------   Adj R-squared   =    0.1131
+       Total |  16806169.6    66,248  253.685691   Root MSE        =        15
+
+-----------------------------------------------------------------------------------
+              age | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+        expns_dif |
+               2  |  -2.914487   .1533155   -19.01   0.000    -3.214985   -2.613988
+               3  |  -2.894694   .1868962   -15.49   0.000     -3.26101   -2.528377
+               4  |  -4.723182   .2290822   -20.62   0.000    -5.172183    -4.27418
+                  |
+       1.rent_yes |   -7.63963   .1495067   -51.10   0.000    -7.932663   -7.346596
+1.health_security |  -7.938064   .1203989   -65.93   0.000    -8.174046   -7.702082
+                  |
+       curfoodsuf |
+               2  |  -.7393612   .1554822    -4.76   0.000    -1.044106    -.434616
+               3  |  -2.856797   .2785121   -10.26   0.000    -3.402681   -2.310913
+               4  |   -2.98564   .4328529    -6.90   0.000    -3.834031   -2.137248
+                  |
+            _cons |   61.43318   .1247841   492.32   0.000      61.1886    61.67775
+-----------------------------------------------------------------------------------
+
+.                 est store reg4
+
+. 
+. /******************************************************************************/      
+. /*****************    display results in table   ******************************/         
+>  
+. /******************************************************************************/
+. 
+. 
+.         esttab r* using "$output/tables/table-1.rtf", ///
+>                         se label replace /// SEs in parantheses, variable labels, replace
+>  output
+>                         title("Regression Outputs") ///
+>                         stats(N r2) /// put n obs and R2 in table
+>                         starlevels(* 0.05 ** 0.01 *** 0.001) /// p-value stars
+>                         note("Regression 1: Bivariate OLS regression between age and econ
+> omic security or 'expns_dif'. Regression 2: Multivariate regression of age on econimic se
+> curity and housing security (represented by rent). Regression 3: Multivariate Regression 
+> of age on economic security, housing security, and health access (represented by access t
+> o health insurance). Regression 4: Multivariate Regression of age on economic security, h
+> ousing security, health access, and food security")
+(output written to ~/Desktop/econ-255-fa23/data-brief-2/output/tables/table-1.rtf)
+
+.                 
+.                 
+. 
+end of do-file
+
